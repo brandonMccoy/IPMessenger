@@ -1,0 +1,95 @@
+package messenger;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.SwingUtilities;
+
+/**
+ * Contains main(string[] args).
+ * 
+ * Sets up the Server and prepares the window. 
+ * Then the ActionListener is set up for the submit button.
+ * If the submit button is clicked, a Client is created, 
+ * the client datapacket is loaded with user input values 
+ * for IP destination, port destination, and String message.
+ * Then the datapacket is sent to the IP address. 
+ * The Server is set to recieve messages.
+ * 
+ * @author Brandon McCoy
+ * @since 05/17/2016
+ */
+public class Controller {
+	
+	static Window window;
+	static Server server;
+	
+	/**
+	 * Adds a custom action listener to the button. 
+	 */
+	public Controller(){
+		window.btnSubmit.addActionListener(
+				new CustomActionListener());
+	}
+
+	/**
+	 * Its possible to send a message to itself
+	 * @param args
+	 */
+	public static void main(String[] args) {
+
+		server = new Server();
+		if(server.loadServer()){
+			window = new Window(
+				server.getLocalIP(),
+				server.getLocalPort(),
+				server.getSubnetMask());
+
+			new Controller();
+			server.readyToReceivePacket();
+		}else{
+			System.exit(1);
+		}
+	}
+
+	/**
+	 * If the Submit button is clicked, a Client will be loaded with 
+	 * the users input, and be sent to a Server. 
+	 * Prints error if the Client fails to send.
+	 * 
+	 * @author Brandon McCoy
+	 * @since 5/14/2016
+	 */
+	private class CustomActionListener implements ActionListener{
+		public void actionPerformed(ActionEvent event) {
+			Object source = event.getSource();
+			if (source == Controller.window.btnSubmit){
+
+				// Send a message
+				Client client = new Client();
+				if(!client.loadMessage())
+					showMsg("Error occurred while loading message.");
+				if(!client.sendMyIP())
+					showMsg("Error occurred while sending my IP message.");
+				if(!client.sendMyPort())
+					showMsg("Error occurred while sending my port message.");
+				if(!client.sendMessage())
+					showMsg("Error occurred while sending message.");
+
+				client.close();
+			}
+		}
+		
+		/**
+		 * 
+		 * @param msg Message to append to the text in the Incoming Messages box.
+		 */
+		private void showMsg(final String msg) {
+			Runnable runnable = new Runnable(){
+				public void run(){
+					Controller.window.appendIncomingMessage(msg);
+				}
+			};
+			SwingUtilities.invokeLater(runnable);
+		}
+	}
+}
