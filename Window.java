@@ -1,5 +1,7 @@
+package messenger;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -14,7 +16,7 @@ import javax.swing.ScrollPaneConstants;
 /**
  * 
  * @author Brandon McCoy
- * @since 05/14/2016
+ * @since 05/17/2016
  */
 public class Window {
 
@@ -39,10 +41,10 @@ public class Window {
 	// Text boxes that are editable by the user
 	JTextField txtDestIP = new JTextField(16);
 	JTextField txtDestPort = new JTextField(16);
-	JTextField txtMsgOut = new JTextField(33);
+	JTextField txtMsgOut = new JTextField(38);
 	
 	// Incoming Messages box
-	JTextArea txtMsgIn = new JTextArea("",10, 33);
+	JTextArea txtMsgIn = new JTextArea("",10, 38);
 	JScrollPane scrMsgInPane = new JScrollPane(txtMsgIn,
 			ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
 			ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -57,10 +59,14 @@ public class Window {
 	Insets centerInsets = new Insets(10, 50, 10, 50);
 	
 	/**
+	 * The JFrame window is set up with a GridBagLayout. 
+	 * All components are added to the container, and given a 
+	 * location in the layout. IP Address, Port number, and Subnet Mask
+	 * are displayed in the UI.
 	 * 
-	 * @param mIP
-	 * @param mPort
-	 * @param mSN
+	 * @param mIP the IP Address to display to the UI
+	 * @param mPort the Port to display to the UI
+	 * @param mSN the Subnet Mask to display to the UI
 	 */
 	public Window(String mIP, String mPort, String mSN)
 	{
@@ -74,8 +80,9 @@ public class Window {
 		
 		// Frame
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setBounds(100, 100, 475, 600);
-		frame.setResizable(false);
+		frame.setBounds(100, 100, 550, 700);
+		frame.setMinimumSize(new Dimension(550,700));
+		frame.setResizable(true);
 		frame.setVisible(true);
 		
 		// Header
@@ -164,11 +171,11 @@ public class Window {
 		txtMsgIn.setLineWrap(true);
 		txtMsgIn.setEditable(false);
 		txtMsgIn.setFocusable(false);
-		txtMsgIn.setOpaque(false);
 	}
 	
 	/**
-	 * An easier way of creating GridBagRestraints, and then adding a component to the container.
+	 * An easier way of creating GridBagRestraints, 
+	 * and then adding a component to the container.
 	 * 
 	 * @param container The JFrame container
 	 * @param component Labels, Textboxes, and submit buttons to add to the JFrame
@@ -198,7 +205,7 @@ public class Window {
 	
 	/**
 	 * 
-	 * @return IP address entered by the user
+	 * @return IP address entered by the user.
 	 */
 	public String getDestinationIP(){
 		return txtDestIP.getText();
@@ -206,7 +213,7 @@ public class Window {
 	
 	/**
 	 * 
-	 * @return Port number entered by the user
+	 * @return Integer Port number entered by the user.
 	 */
 	public Integer getDestinationPortInt(){
 		return Integer.parseInt(txtDestPort.getText());
@@ -214,7 +221,7 @@ public class Window {
 	
 	/**
 	 * 
-	 * @return
+	 * @return String Port number entered by the user.
 	 */
 	public String getDestinationPort(){
 		return txtDestPort.getText();
@@ -222,7 +229,23 @@ public class Window {
 	
 	/**
 	 * 
-	 * @param msg
+	 * @return the port used for this application.
+	 */
+	public String getMyPort(){
+		return lblMyPort.getText();
+	}
+
+	/**
+	 * 
+	 * @return the IP address of this pc.
+	 */
+	public String getMyIP(){
+		return lblMyIP.getText();
+	}
+	
+	/**
+	 * 
+	 * @param msg 
 	 */
 	public void appendIncomingMessage(String msg){
 		txtMsgIn.append("\n" + msg);
