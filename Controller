@@ -1,8 +1,10 @@
 package messenger;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+
 import javax.swing.SwingUtilities;
 
 // TODO figure out which IP address this computer is communicating on.
@@ -68,6 +70,7 @@ public class Controller {
 	 */
 	public static void main(String[] args) {
 		Controller controller = new Controller();
+		
 		server = new Server();
 		if(server.loadServer()){
 			window = new Window(
@@ -111,7 +114,7 @@ public class Controller {
 
 			client.close();
 	}
-		
+
 	/**
 	 * 
 	 * @param msg Message to append to the text in the Incoming Messages box.

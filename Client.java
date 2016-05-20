@@ -1,4 +1,5 @@
 package messenger;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -71,7 +72,7 @@ public class Client{
 	 */
 	public boolean sendMessage(){
 
-		msg = new String("--> " + outgoingMessage);
+		msg = new String("--> " + outgoingMessage + "\n");
 
 		// Load DatagramPacket
 		loadPacket();
