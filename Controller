@@ -1,8 +1,12 @@
 package messenger;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import javax.swing.SwingUtilities;
+
+// TODO figure out which IP address this computer is communicating on.
+// getLocalHost may not be the way to go.
 
 /**
  * Contains main(string[] args).
@@ -24,19 +28,46 @@ public class Controller {
 	static Server server;
 	
 	/**
-	 * Adds a custom action listener to the button. 
+	 * Constructor is empty
 	 */
 	public Controller(){
-		window.btnSubmit.addActionListener(
-				new CustomActionListener());
+		
+	}
+	
+	/**
+	 * Adds a custom action listener and KeyListener to the submit button.
+	 */
+	public void addListeners(){
+		window.btnSubmit.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent event) {
+				SendMessage();
+			}
+		});
+		
+		window.btnSubmit.addKeyListener(new KeyListener(){
+			@Override
+			public void keyPressed(KeyEvent e) {
+				int key = e.getKeyCode();
+				if (key == KeyEvent.VK_ENTER) {
+					SendMessage();
+				}
+			}
+
+			@Override
+			public void keyReleased(KeyEvent e) {}
+
+			@Override
+			public void keyTyped(KeyEvent e) {}
+		});
 	}
 
 	/**
-	 * Its possible to send a message to itself
+	 * Because the Server, Client, and Window all run on different threads,
+	 * it is possible for this application to send a message to itself.
 	 * @param args
 	 */
 	public static void main(String[] args) {
-
+		Controller controller = new Controller();
 		server = new Server();
 		if(server.loadServer()){
 			window = new Window(
@@ -44,52 +75,53 @@ public class Controller {
 				server.getLocalPort(),
 				server.getSubnetMask());
 
-			new Controller();
-			server.readyToReceivePacket();
+			// Add action listener to the submit button
+			controller.addListeners();
+			
+			// The server is set to receive on its own thread
+			// because the receive method of DatagramSocket 
+			// interferes/interrupts with the Window user interaction.
+			Runnable runServer = new Runnable(){
+				public void run() {
+					server.readyToReceivePacket();
+				}
+			};
+			runServer.run();
 		}else{
 			System.exit(1);
 		}
 	}
 
 	/**
-	 * If the Submit button is clicked, a Client will be loaded with 
+	 * Client will be loaded with 
 	 * the users input, and be sent to a Server. 
-	 * Prints error if the Client fails to send.
-	 * 
-	 * @author Brandon McCoy
-	 * @since 5/14/2016
+	 * Prints error if any part of the Client fails to send.
 	 */
-	private class CustomActionListener implements ActionListener{
-		public void actionPerformed(ActionEvent event) {
-			Object source = event.getSource();
-			if (source == Controller.window.btnSubmit){
+	private void SendMessage() {
+			// Send a message
+			Client client = new Client();
+			if(!client.loadMessage())
+				showMsg("Error occurred while loading message.");
+			if(!client.sendMyIP())
+				showMsg("Error occurred while sending my IP message.");
+			if(!client.sendMyPort())
+				showMsg("Error occurred while sending my port message.");
+			if(!client.sendMessage())
+				showMsg("Error occurred while sending message.");
 
-				// Send a message
-				Client client = new Client();
-				if(!client.loadMessage())
-					showMsg("Error occurred while loading message.");
-				if(!client.sendMyIP())
-					showMsg("Error occurred while sending my IP message.");
-				if(!client.sendMyPort())
-					showMsg("Error occurred while sending my port message.");
-				if(!client.sendMessage())
-					showMsg("Error occurred while sending message.");
-
-				client.close();
-			}
-		}
+			client.close();
+	}
 		
-		/**
-		 * 
-		 * @param msg Message to append to the text in the Incoming Messages box.
-		 */
-		private void showMsg(final String msg) {
-			Runnable runnable = new Runnable(){
-				public void run(){
-					Controller.window.appendIncomingMessage(msg);
-				}
-			};
-			SwingUtilities.invokeLater(runnable);
-		}
+	/**
+	 * 
+	 * @param msg Message to append to the text in the Incoming Messages box.
+	 */
+	private void showMsg(final String msg) {
+		Runnable runnable = new Runnable(){
+			public void run(){
+				Controller.window.appendIncomingMessage(msg);
+			}
+		};
+		SwingUtilities.invokeLater(runnable);
 	}
 }
