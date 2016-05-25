@@ -1,14 +1,10 @@
 package messenger;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-
 import javax.swing.SwingUtilities;
 
-// TODO figure out which IP address this computer is communicating on.
-// getLocalHost may not be the way to go.
 
 /**
  * Contains main(string[] args).
@@ -27,7 +23,6 @@ import javax.swing.SwingUtilities;
 public class Controller {
 	
 	static Window window;
-	static Server server;
 	
 	/**
 	 * Constructor is empty
@@ -45,7 +40,7 @@ public class Controller {
 				SendMessage();
 			}
 		});
-		
+
 		window.btnSubmit.addKeyListener(new KeyListener(){
 			@Override
 			public void keyPressed(KeyEvent e) {
@@ -66,19 +61,20 @@ public class Controller {
 	/**
 	 * Because the Server, Client, and Window all run on different threads,
 	 * it is possible for this application to send a message to itself.
+	 * The application will close if any of the information needed to run
+	 * this application is not loaded correctly. (Server.loadServer fails)
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		Controller controller = new Controller();
-		
-		server = new Server();
+		final Server server = new Server();
 		if(server.loadServer()){
 			window = new Window(
-				server.getLocalIP(),
-				server.getLocalPort(),
-				server.getSubnetMask());
+					server.getLocalIP(),
+					server.getLocalPort(),
+					server.getSubnetMask());
 
-			// Add action listener to the submit button
+			// Add actionListener and keyListener to the submit button
 			controller.addListeners();
 			
 			// The server is set to receive on its own thread
@@ -98,25 +94,22 @@ public class Controller {
 	/**
 	 * Client will be loaded with 
 	 * the users input, and be sent to a Server. 
-	 * Prints error if any part of the Client fails to send.
+	 * Prints error to the UI if any part of the Client fails to send.
 	 */
 	private void SendMessage() {
-			// Send a message
 			Client client = new Client();
+			
 			if(!client.loadMessage())
 				showMsg("Error occurred while loading message.");
-			if(!client.sendMyIP())
-				showMsg("Error occurred while sending my IP message.");
-			if(!client.sendMyPort())
-				showMsg("Error occurred while sending my port message.");
+			
 			if(!client.sendMessage())
 				showMsg("Error occurred while sending message.");
-
 			client.close();
 	}
-
+		
 	/**
-	 * 
+	 * Prints message to the UI. Message is appended to keep a history of
+	 * all incoming messages.
 	 * @param msg Message to append to the text in the Incoming Messages box.
 	 */
 	private void showMsg(final String msg) {

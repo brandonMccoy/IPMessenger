@@ -1,5 +1,4 @@
 package messenger;
-
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -36,7 +35,8 @@ public class Client{
 	}
 	
 	/**
-	 * Loads all of the important data needed to send messages.
+	 * Loads all of the important data from the open window (JFrame) 
+	 * needed to send a message.
 	 * 
 	 * @return false if an exception occurs, true if successful.
 	 */
@@ -64,69 +64,6 @@ public class Client{
 		}
 		return true;
 	}
-	
-	/**
-	 * Sends the users written message to the server.
-	 * 
-	 * @return false if an exception occurs, true if successful.
-	 */
-	public boolean sendMessage(){
-
-		msg = new String("--> " + outgoingMessage + "\n");
-
-		// Load DatagramPacket
-		loadPacket();
-
-		// Send Message
-		if(!send(packetSend)){
-			showMsg("Failed to send message.");
-			return false;
-		}
-
-		return true;
-	}
-
-	/**
-	 * Sends the port number that this applications Server class is listening on.
-	 * 
-	 * @return false if an exception occurs, true if successful.
-	 */
-	public boolean sendMyPort(){
-
-		msg = new String("Server is listening on port " + Controller.window.getMyPort());
-		
-		// Load DatagramPacket
-		loadPacket();
-
-		// Send Message
-		if(!send(packetSend)){
-			showMsg("Failed to send message.");
-			return false;
-		}
-
-		return true;
-	}
-
-	/**
-	 * Sends the IP address of this application.
-	 * 
-	 * @return false if an exception occurs, true if successful.
-	 */
-	public boolean sendMyIP(){
-
-		msg = new String("From IP Address " + Controller.window.getMyIP());
-
-		// Load DatagramPacket
-		loadPacket();
-
-		// Send Message
-		if(!send(packetSend)){
-			showMsg("Failed to send message.");
-			return false;
-		}
-
-		return true;
-	}
 
 	/**
 	 * Closes this DatagramSocket.
@@ -136,7 +73,8 @@ public class Client{
 	}
 
 	/**
-	 * 
+	 * Prepares the DatagramPacket to be sent, with the users UI input.
+	 * Must be called before the DatagramPacket is sent.
 	 */
 	private void loadPacket(){
 		byte buff[] = msg.getBytes();
@@ -146,7 +84,29 @@ public class Client{
 
 	/**
 	 * 
-	 * @param dp
+	 * @return false if an exception occurs, true if successful.
+	 */
+	public boolean sendMessage(){
+
+		msg = new String("From IP Address " + Controller.window.getMyIP()
+			+ "\nServer is listening on port " + Controller.window.getMyPort()
+			+ "\n--> " + outgoingMessage);
+
+		// Load DatagramPacket
+		loadPacket();
+
+		// Send Message
+		if(!send(packetSend)){
+			showMsg("Failed to send message.");
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * 
+	 * @param dp A preloaded DatagramPacket to be sent to the assigned host.
 	 * @return false if an exception occurs, true if successful.
 	 */
 	private boolean send(DatagramPacket dp){
@@ -171,5 +131,4 @@ public class Client{
 		};
 		SwingUtilities.invokeLater(runnable);
 	}
-
 }

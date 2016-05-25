@@ -1,9 +1,7 @@
 package messenger;
-
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -49,7 +47,8 @@ public class Server {
 		}
 
 		try {
-			strLocalIP = new String(String.valueOf(Inet4Address.getLocalHost()));
+			InetAddress inetAddress = InetAddress.getLocalHost();
+			strLocalIP = new String(inetAddress.getHostAddress());
 		} catch (UnknownHostException e) {
 			return false;
 		}
