@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
+/* deprecated */
 public class IPv4Addresses {
 	
 	private List<String> ipAddresses;
